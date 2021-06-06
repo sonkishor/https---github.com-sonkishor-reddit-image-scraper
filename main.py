@@ -8,6 +8,7 @@ import re
 import time
 from nltk import flatten
 import requests
+import threading
 
 
 options = Options()
@@ -18,7 +19,7 @@ browser.get("https://www.reddit.com/r/F1Porn")
 
 html = browser.find_element_by_tag_name('html')
 i = 0
-while True and i <= 50:
+while True and i <= 10:
     html.send_keys(Keys.PAGE_DOWN)
     time.sleep(1)
     i += 1;
@@ -60,15 +61,22 @@ images = flatten(images)
 
 #for downlaoding the images
 
-for i, img in enumerate(images):
-    response = requests.get(img)
+def imageDownloader(num):
+    response = requests.get(images[num])
     try:
-        print("Downlaoding {}".format(h3[i]))
-        file = open("output\{}.png".format(h3[i]), "wb")
+        print("\n\n\nDownlaoding {}".format(h3[num]))
+        file = open("output\{}.png".format(h3[num]), "wb")
     except OSError: 
-        print("***********{} F A I L E D***********".format(h3[i]))
+        print("\n\n\n{***********F A I L E D***********}".format(h3[num]))
     else:
         print("Download Finished...Saving")
         file.write(response.content)
         print("Done")
         file.close()
+
+for i in range(len(images)):
+    x = threading.Thread(target=imageDownloader, args=(i,))
+    x.start()
+
+x.join()
+print("********Everything is downloaded**************")
